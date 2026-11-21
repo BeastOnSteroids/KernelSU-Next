@@ -1,19 +1,15 @@
-name: Build Manager
+name: Build Manager (Built-in GKI)
 
 on:
   workflow_call:
   workflow_dispatch:
 
 jobs:
-  build-lkm:
-    uses: ./.github/workflows/build-lkm.yml
-    secrets: inherit
-
   build-ksuinit:
     uses: ./.github/workflows/ksuinit.yml
 
   build-ksud:
-    needs: [build-lkm, build-ksuinit]
+    needs: build-ksuinit
     strategy:
       matrix:
         include:
@@ -27,9 +23,10 @@ jobs:
     with:
       target: ${{ matrix.target }}
       os: ${{ matrix.os }}
+      pack_lkm: false
 
   build-ksud-extra:
-    needs: [build-lkm, build-ksuinit]
+    needs: build-ksuinit
     strategy:
       matrix:
         include:
@@ -47,6 +44,7 @@ jobs:
     with:
       target: ${{ matrix.target }}
       os: ${{ matrix.os }}
+      pack_lkm: false
 
   build-manager:
     needs: build-ksud
